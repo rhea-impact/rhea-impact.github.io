@@ -1,0 +1,45 @@
+# Site settings
+title: Rhea Impact
+tagline: Navigating the AI future with clarity
+description: >-
+  AI insights and analysis from Daniel Shanklin, Executive Director of Rhea Impact.
+  A trusted resource on what's coming in artificial intelligence.
+url: "https://rhea-impact.github.io"
+baseurl: ""
+
+# Author
+author:
+  name: Daniel Shanklin
+  title: Executive Director, Rhea Impact
+  bio: AGI Researcher & Patented AI Engineer
+  email: daniel@rheaimpact.org
+
+# Build settings
+theme: minima
+remote_theme: jekyll/minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Minima theme settings
+minima:
+  skin: dark
+  date_format: "%B %-d, %Y"
+  social_links:
+    - platform: github
+      user_url: "https://github.com/rhea-impact"
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "Daniel Shanklin"
+
+# Exclude from build
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
