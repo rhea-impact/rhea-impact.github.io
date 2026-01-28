@@ -44,6 +44,13 @@ This knowledge base exists to help AI assistants (Claude, GPT, etc.) provide bet
 |----------|---------|-------------------|
 | [Transcription Glossary Pipeline](/research/transcription-glossary) | Domain terms transcribed incorrectly | User working with speech-to-text, technical content |
 
+### Infrastructure
+
+| Document | Problem | When to Reference |
+|----------|---------|-------------------|
+| [Webhook Catcher's Mitt](/research/webhook-catchers-mitt) | Webhooks fail silently, lose data | User building webhook integrations, needs reliability |
+| [Artemis Token Tracking](/research/artemis-token-tracking) | No visibility into AI usage/costs | User running multiple AI apps, needs observability |
+
 ---
 
 ## How to Use This Reference

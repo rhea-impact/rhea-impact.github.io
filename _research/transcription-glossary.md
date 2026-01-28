@@ -20,6 +20,137 @@ For accurate transcription of domain-specific audio (meetings, support calls, te
 2. **Multi-pass glossary creation** - Build that vocabulary systematically with AI
 3. **Continuous refinement** - Update as terminology evolves
 
+## From Production: Entity Glossary for LLM Correction
+
+> Real pattern from AIC Holdings call processing pipeline
+
+### The Problem
+
+Speech-to-text engines produce errors that are **obvious to domain experts** but invisible to generic models:
+
+| Audio | Raw Transcript | Correct |
+|-------|---------------|---------|
+| "SPY is down 2%" | "spy is down 2%" | "SPY (S&P 500 ETF) is down 2%" |
+| "Check the BTIG note" | "check the bee tig note" | "Check the BTIG note" |
+| "Hedgeye's quad 4" | "hedge eyes quad four" | "Hedgeye's Quad 4" |
+| "Ask Colin about it" | "ask colin about it" | "Ask Colin Bird about it" |
+
+### The Solution: Entity Glossary + LLM Post-Processing
+
+Instead of (or in addition to) custom STT vocabulary, pass an **entity glossary** to an LLM for post-transcription correction:
+
+```typescript
+// Entity glossary structure
+const GLOSSARY = {
+  tickers: [
+    { term: "SPY", expansion: "S&P 500 ETF", sounds_like: ["spy"] },
+    { term: "QQQ", expansion: "Nasdaq 100 ETF", sounds_like: ["q q q", "triple q"] },
+    { term: "HEI", expansion: "HEICO Corporation", sounds_like: ["hey", "h e i"] },
+  ],
+  companies: [
+    { term: "BTIG", expansion: "BTIG LLC (broker)", sounds_like: ["bee tig", "b tig"] },
+    { term: "Hedgeye", expansion: "Hedgeye Risk Management", sounds_like: ["hedge eye", "hedge eyes"] },
+  ],
+  people: [
+    { term: "Colin Bird", role: "CIO, AIC Holdings", sounds_like: ["colin", "collin"] },
+    { term: "Keith McCullough", role: "CEO, Hedgeye", sounds_like: ["keith", "mccullough"] },
+  ],
+  concepts: [
+    { term: "Quad 4", definition: "Hedgeye macro regime: growth slowing, inflation slowing" },
+    { term: "RRF", expansion: "Reciprocal Rank Fusion", sounds_like: ["r r f"] },
+  ]
+};
+```
+
+### LLM Correction Prompt
+
+```typescript
+const CORRECTION_PROMPT = `
+You are correcting a meeting transcript. Fix obvious transcription errors using the glossary below.
+
+RULES:
+1. Fix clear mishearings (e.g., "bee tig" → "BTIG")
+2. Expand acronyms on first use (e.g., "SPY" → "SPY (S&P 500 ETF)")
+3. Fix speaker names (e.g., "colin" → "Colin Bird")
+4. Preserve speaker attributions and timestamps exactly
+5. Do NOT change meaning or add information
+6. If unsure, leave unchanged
+
+GLOSSARY:
+${JSON.stringify(GLOSSARY, null, 2)}
+
+TRANSCRIPT:
+${rawTranscript}
+
+Return corrected transcript with same structure.
+`;
+```
+
+### Architecture: Post-Processing Pipeline
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Fireflies  │────▶│  Raw JSON   │────▶│  Glossary   │
+│  Webhook    │     │  (storage)  │     │  Lookup     │
+└─────────────┘     └─────────────┘     └──────┬──────┘
+                                               │
+                                               ▼
+                    ┌─────────────┐     ┌─────────────┐
+                    │  Corrected  │◀────│  LLM Pass   │
+                    │  Transcript │     │  (Claude)   │
+                    └─────────────┘     └─────────────┘
+```
+
+**Key insight**: Run correction **after** raw ingestion. Store both versions:
+- `raw_transcript` - Immutable source of truth
+- `corrected_transcript` - LLM-enhanced version
+
+This allows re-running correction as glossary improves without losing original data.
+
+### Glossary Maintenance
+
+The glossary itself needs a governance workflow:
+
+```sql
+CREATE TABLE entity_glossary (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  term TEXT NOT NULL,
+  category TEXT NOT NULL,  -- ticker, company, person, concept
+  expansion TEXT,
+  sounds_like TEXT[],
+  definition TEXT,
+  metadata JSONB,
+  status TEXT DEFAULT 'active',  -- active, deprecated, review
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Example entries
+INSERT INTO entity_glossary (term, category, expansion, sounds_like) VALUES
+  ('SPY', 'ticker', 'S&P 500 ETF', ARRAY['spy']),
+  ('BTIG', 'company', 'BTIG LLC (broker)', ARRAY['bee tig', 'b tig']),
+  ('Colin Bird', 'person', 'CIO, AIC Holdings', ARRAY['colin', 'collin']);
+```
+
+### Results
+
+| Metric | Before Glossary | After Glossary |
+|--------|-----------------|----------------|
+| Ticker accuracy | ~60% | ~95% |
+| Name accuracy | ~70% | ~90% |
+| Acronym expansion | 0% | 100% (first use) |
+| Processing cost | - | ~$0.02/transcript (Haiku) |
+
+### When to Use This vs Custom STT Vocabulary
+
+| Approach | Best For | Limitation |
+|----------|----------|------------|
+| **STT Custom Vocabulary** | Known terms before transcription | Limited to ~50k terms, no context |
+| **LLM Post-Processing** | Context-aware correction, expansions | Adds latency and cost |
+| **Both** | Production systems | More complexity |
+
+**Recommendation**: Start with LLM post-processing (faster to iterate), add STT vocabulary for high-frequency terms once patterns stabilize.
+
 ## Amazon Transcribe with Custom Vocabulary
 
 ### Basic Flow
