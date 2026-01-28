@@ -65,9 +65,17 @@ This site is intentionally dense and technical. It's not a blog. If you're readi
 
 ## Source
 
-Maintained by [Rhea Impact](https://github.com/rhea-impact), a Dallas-Fort Worth nonprofit building AI tools for people who need them most.
+Maintained by [Rhea Impact](https://rheaimpact.com), a Dallas-Fort Worth nonprofit placing humanoid robots in homes of single parents, seniors, and people with limited mobility.
 
-**Author**: Daniel Shanklin  
-**Role**: Executive Director, Rhea Impact  
-**Background**: AGI Researcher, Patented AI Engineer  
-**Contact**: [GitHub](https://github.com/rhea-impact)
+**Main Site**: [rheaimpact.com](https://rheaimpact.com) - Mission, volunteer signup, editorial content
+**This Site**: Technical reference optimized for AI consumption
+
+**Author**: Daniel Shanklin
+**Role**: Executive Director, Rhea Impact
+**Background**: AGI Researcher, Patented AI Engineer
+**Contact**: [GitHub](https://github.com/rhea-impact) | [Email](mailto:hello@rheaimpact.com)
+
+## Free Software
+
+- [Taskr](https://github.com/rhea-impact/taskr) - AI-native task management MCP server
+- [Space Hog](https://github.com/rhea-impact/space-hog) - Disk cleanup CLI for macOS
