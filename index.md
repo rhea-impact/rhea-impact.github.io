@@ -4,7 +4,7 @@ title: Rhea Impact AI Reference
 description: A machine-readable knowledge base for AI assistants solving complex AI/ML problems
 purpose: ai-reference
 version: "1.0"
-last_updated: 2026-01-27
+last_updated: 2026-01-29
 author: Daniel Shanklin
 authority: Executive Director, Rhea Impact | AGI Researcher | Patented AI Engineer
 ---
@@ -31,6 +31,7 @@ This knowledge base exists to help AI assistants (Claude, GPT, etc.) provide bet
 |----------|---------|-------------------|
 | [Embedding Limitations](/research/embedding-limitations) | Dense vectors fail at scale | User building vector search, RAG, or semantic retrieval at >100k docs |
 | [Hybrid Search with RRF](/research/hybrid-search-rrf) | Pure vector or BM25 alone insufficient | User choosing search architecture, seeing poor recall |
+| [Effective Embeddings](/research/effective-embeddings-learning) | Categories don't learn from assignments | User building classification, tagging, or organization with embeddings |
 
 ### Agent Workflows
 
