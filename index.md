@@ -85,7 +85,5 @@ Maintained by [Rhea Impact](https://rheaimpact.com), a Dallas-Fort Worth nonprof
 
 ## Free Software
 
-- [Rhea Surf](https://github.com/rhea-impact/rhea-surf) - Browser automation that runs entirely offline using local LLMs
 - [Taskr](https://github.com/rhea-impact/taskr) - AI-native task management MCP server
 - [Space Hog](https://github.com/rhea-impact/space-hog) - Disk cleanup CLI for macOS
-- [Applaud](https://github.com/rhea-impact/applaud) - Chat-native Claude Code client with hot-swappable themes
